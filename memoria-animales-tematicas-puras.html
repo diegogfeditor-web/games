@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memoria Animal - Edición Temática Pura 🦁</title>
+    <style>
+        :root {
+            --bg-color: #f0f7f4;
+            --card-back: #2d6a4f;
+            --card-back-border: #1b4332;
+            --card-front: #ffffff;
+            --p1-color: #1d3557;
+            --p1-bg: #a8dadc;
+            --p2-color: #7f4f24;
+            --p2-bg: #ede0d4;
+            --text-color: #1b4332;
+            --accent-color: #40916c;
+            --accent-hover: #2d6a4f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 15px;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 12px;
+            width: 100%;
+            max-width: 580px;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+        }
+
+        .icon-btn {
+            background: white;
+            color: var(--text-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            transition: transform 0.15s, background-color 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: #e9ecef;
+            transform: scale(1.05);
+        }
+
+        .settings-panel {
+            background: white;
+            padding: 10px 12px;
+            border-radius: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .settings-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        select, input[type="text"] {
+            padding: 5px 8px;
+            border-radius: 8px;
+            border: 2px solid #d8e2dc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-color);
+            background: #f8f9fa;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: var(--accent-color);
+            background: white;
+        }
+
+        input[type="text"] {
+            width: 110px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Barra de progreso Modo Niveles */
+        .levels-hud {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.06);
+            margin-bottom: 10px;
+            border: 2px solid var(--accent-color);
+        }
+
+        .levels-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .level-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .level-grid-info {
+            font-size: 0.85rem;
+            font-weight: 700;
+            opacity: 0.85;
+        }
+
+        .level-dots {
+            display: flex;
+            justify-content: space-between;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .level-dot {
+            flex: 1;
+            height: 6px;
+            border-radius: 4px;
+            background: #e0e0e0;
+            transition: background-color 0.3s;
+        }
+
+        .level-dot.completed {
+            background: var(--accent-color);
+        }
+
+        .level-dot.current {
+            background: #f4a261;
+            box-shadow: 0 0 6px rgba(244, 162, 97, 0.6);
+        }
+
+        /* Marcador 2 Jugadores / CPU */
+        .scoreboard {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .player-box {
+            flex: 1;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 3px solid transparent;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            opacity: 0.65;
+        }
+
+        .player-box.active {
+            opacity: 1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+        }
+
+        .player-box.p1.active {
+            border-color: var(--p1-color);
+            background-color: #f1faee;
+        }
+
+        .player-box.p2.active {
+            border-color: var(--p2-color);
+            background-color: #fff8f0;
+        }
+
+        .player-name {
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-score {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        /* Panel Contrarreloj / Niveles */
+        .timer-panel {
+            background: white;
+            padding: 8px 14px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 8px;
+        }
+
+        .timer-stats {
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .time-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .time-bar {
+            height: 100%;
+            width: 100%;
+            background: var(--accent-color);
+            transition: width 0.25s linear, background-color 0.3s ease;
+        }
+
+        .time-bar.warning {
+            background: #f4a261;
+        }
+
+        .time-bar.danger {
+            background: #e63946;
+        }
+
+        .turn-indicator {
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 5px 14px;
+            border-radius: 20px;
+            background: white;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Tablero adaptable */
+        .game-board {
+            display: grid;
+            gap: 8px;
+            width: 100%;
+            max-width: 540px;
+            perspective: 1000px;
+            margin-bottom: 16px;
+        }
+
+        .card {
+            aspect-ratio: 1 / 1;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            transform: rotateY(180deg) scale(0.95);
+            cursor: default;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            user-select: none;
+            transition: background-color 0.4s ease, border-color 0.4s ease;
+            padding: 2px;
+        }
+
+        .card-back {
+            background-color: var(--card-back);
+            color: white;
+            border: 2px solid var(--card-back-border);
+        }
+
+        .card-back span {
+            opacity: 0.45;
+            font-size: 1.5rem;
+        }
+
+        .card-front {
+            background-color: var(--card-front);
+            transform: rotateY(180deg);
+            border: 2px solid var(--accent-color);
+        }
+
+        .card-emoji {
+            line-height: 1.1;
+        }
+
+        .card-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-top: 2px;
+            text-align: center;
+            line-height: 1;
+            max-width: 95%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Ajustes según tamaño de cartas */
+        .size-lg .card-emoji { font-size: 2.8rem; }
+        .size-lg .card-label { font-size: 0.78rem; }
+
+        .size-md .card-emoji { font-size: 2.2rem; }
+        .size-md .card-label { font-size: 0.68rem; }
+
+        .size-sm .card-emoji { font-size: 1.7rem; }
+        .size-sm .card-label { font-size: 0.58rem; }
+        .size-sm .card-back span { font-size: 1.1rem; }
+
+        .size-xs .card-emoji { font-size: 1.4rem; }
+        .size-xs .card-label { display: none; }
+        .size-xs .card-back span { font-size: 0.95rem; }
+
+        .card.matched-p1 .card-front {
+            background-color: var(--p1-bg);
+            border-color: var(--p1-color);
+        }
+
+        .card.matched-p2 .card-front {
+            background-color: var(--p2-bg);
+            border-color: var(--p2-color);
+        }
+
+        .action-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .action-btn:active {
+            transform: scale(0.97);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 370px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            margin-bottom: 10px;
+            font-size: 1.65rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .secondary-btn {
+            background-color: #6c757d;
+        }
+
+        .secondary-btn:hover {
+            background-color: #5a6268;
+        }
+
+        @media (max-width: 480px) {
+            .game-board { gap: 5px; }
+            .size-lg .card-emoji { font-size: 2.2rem; }
+            .size-md .card-emoji { font-size: 1.7rem; }
+            .size-sm .card-emoji { font-size: 1.35rem; }
+            .size-xs .card-emoji { font-size: 1.15rem; }
+            .card-label { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="title-row">
+            <h1 id="game-title">🦁 Memoria Animal</h1>
+            <button class="icon-btn" id="sound-btn" title="Activar/Silenciar sonido">🔊</button>
+        </div>
+
+        <div class="settings-panel">
+            <div class="settings-row">
+                <div class="control-group">
+                    <label for="theme-select">Temática:</label>
+                    <select id="theme-select">
+                        <option value="levels_mix">🌈 Todas las Especies</option>
+                        <option value="farm">🚜 Granja</option>
+                        <option value="jungle">🌴 Selva</option>
+                        <option value="sea">🌊 Mar y Océano</option>
+                        <option value="dinos">🦖 Dinosaurios</option>
+                        <option value="insects">🦋 Insectos y Bichos</option>
+                        <option value="birds">🦅 Aves</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="mode-select">Modo:</label>
+                    <select id="mode-select">
+                        <option value="levels" selected>🏆 Niveles</option>
+                        <option value="timed">⏱️ Contrarreloj</option>
+                        <option value="pvp">👥 2 Jugadores</option>
+                        <option value="cpu">🤖 vs CPU</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="control-group hidden" id="difficulty-group">
+                    <label for="difficulty-select">Tablero:</label>
+                    <select id="difficulty-select">
+                        <option value="easy">Fácil (12)</option>
+                        <option value="medium" selected>Medio (16)</option>
+                        <option value="hard">Difícil (24)</option>
+                    </select>
+                </div>
+
+                <div class="control-group hidden" id="cpu-level-group">
+                    <label for="cpu-level">IA:</label>
+                    <select id="cpu-level">
+                        <option value="0.25">Principiante</option>
+                        <option value="0.60" selected>Normal</option>
+                        <option value="0.95">Experta</option>
+                    </select>
+                </div>
+
+                <div class="control-group hidden" id="names-group">
+                    <input type="text" id="p1-input" value="Jugador 1" maxlength="12" placeholder="Nombre J1">
+                    <span id="vs-label">vs</span>
+                    <input type="text" id="p2-input" value="Jugador 2" maxlength="12" placeholder="Nombre J2">
+                </div>
+            </div>
+        </div>
+
+        <!-- HUD para Modo Niveles -->
+        <div class="levels-hud" id="levels-hud">
+            <div class="levels-header">
+                <span class="level-badge" id="level-badge">Nivel 1 / 8</span>
+                <span class="level-grid-info" id="level-grid-info">Tablero 2x3 (6 cartas)</span>
+            </div>
+            <div class="level-dots" id="level-dots"></div>
+        </div>
+
+        <!-- Marcador para 2 Jugadores / CPU -->
+        <div class="scoreboard hidden" id="scoreboard-area">
+            <div class="player-box p1 active" id="p1-box">
+                <div class="player-name" id="p1-name-display" style="color: var(--p1-color);">Jugador 1</div>
+                <div class="player-score" id="p1-score">0</div>
+            </div>
+            <div class="player-box p2" id="p2-box">
+                <div class="player-name" id="p2-name-display" style="color: var(--p2-color);">Jugador 2</div>
+                <div class="player-score" id="p2-score">0</div>
+            </div>
+        </div>
+
+        <!-- Panel para Contrarreloj / Niveles -->
+        <div class="timer-panel" id="timer-area">
+            <div class="timer-stats">
+                <span>⏳ Tiempo: <span id="time-left">30</span>s</span>
+                <span>🔄 Movimientos: <span id="moves-count">0</span></span>
+            </div>
+            <div class="time-bar-container">
+                <div class="time-bar" id="time-bar"></div>
+            </div>
+        </div>
+
+        <div class="turn-indicator" id="turn-text">¡Superá los 8 niveles!</div>
+    </header>
+
+    <main class="game-board size-lg" id="board"></main>
+
+    <button class="action-btn" id="restart-btn">Reiniciar Nivel</button>
+
+    <div class="modal" id="win-modal">
+        <div class="modal-content">
+            <h2 id="winner-title">🏆 ¡Nivel Completado!</h2>
+            <p id="win-stats"></p>
+            <div class="modal-buttons">
+                <button class="action-btn secondary-btn hidden" id="reset-campaign-btn">Desde Nivel 1</button>
+                <button class="action-btn" id="play-again-btn">Siguiente Nivel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Temáticas estrictamente curadas: 18 especies únicas por categoría (soporta hasta 6x6 = 36 cartas)
+        const THEMES = {
+            farm: {
+                title: '🚜 Granja',
+                backIcon: '🌾',
+                items: [
+                    { emoji: '🐄', name: 'Vaca' }, { emoji: '🐖', name: 'Cerdo' }, { emoji: '🐑', name: 'Oveja' },
+                    { emoji: '🐎', name: 'Caballo' }, { emoji: '🐓', name: 'Gallo' }, { emoji: '🐔', name: 'Gallina' },
+                    { emoji: '🐤', name: 'Pollito' }, { emoji: '🦆', name: 'Pato' }, { emoji: '🐐', name: 'Cabra' },
+                    { emoji: '🐇', name: 'Conejo' }, { emoji: '🐕', name: 'Perro' }, { emoji: '🐈', name: 'Gato' },
+                    { emoji: '🦃', name: 'Pavo' }, { emoji: '🫏', name: 'Burro' }, { emoji: '🐂', name: 'Buey' },
+                    { emoji: '🐏', name: 'Carnero' }, { emoji: '🐁', name: 'Ratón' }, { emoji: '🦢', name: 'Ganso' }
+                ],
+                colors: {
+                    bg: '#fefae0', back: '#bc6c25', backBorder: '#7f4f24',
+                    text: '#582f0e', accent: '#dda15e', hover: '#bc6c25'
+                }
+            },
+            jungle: {
+                title: '🌴 Selva',
+                backIcon: '🌿',
+                items: [
+                    { emoji: '🐅', name: 'Tigre' }, { emoji: '🐆', name: 'Leopardo' }, { emoji: '🦍', name: 'Gorila' },
+                    { emoji: '🦧', name: 'Orangután' }, { emoji: '🐒', name: 'Mono' }, { emoji: '🐘', name: 'Elefante' },
+                    { emoji: '🐍', name: 'Serpiente' }, { emoji: '🐊', name: 'Cocodrilo' }, { emoji: '🦜', name: 'Guacamayo' },
+                    { emoji: '🦥', name: 'Perezoso' }, { emoji: '🦛', name: 'Hipopótamo' }, { emoji: '🦏', name: 'Rinoceronte' },
+                    { emoji: '🐸', name: 'Rana' }, { emoji: '🦎', name: 'Camaleón' }, { emoji: '🐼', name: 'Panda' },
+                    { emoji: '🐨', name: 'Koala' }, { emoji: '🐆', name: 'Jaguar' }, { emoji: '🦩', name: 'Flamenco' }
+                ],
+                colors: {
+                    bg: '#e8f5e9', back: '#1b4332', backBorder: '#081c15',
+                    text: '#1b4332', accent: '#2d6a4f', hover: '#1b4332'
+                }
+            },
+            sea: {
+                title: '🌊 Mar y Océano',
+                backIcon: '🫧',
+                items: [
+                    { emoji: '🐋', name: 'Ballena' }, { emoji: '🐳', name: 'Ballena Azul' }, { emoji: '🐬', name: 'Delfín' },
+                    { emoji: '🦈', name: 'Tiburón' }, { emoji: '🐙', name: 'Pulpo' }, { emoji: '🦑', name: 'Calamar' },
+                    { emoji: '🦀', name: 'Cangrejo' }, { emoji: '🦞', name: 'Langosta' }, { emoji: '🦐', name: 'Camarón' },
+                    { emoji: '🐠', name: 'Pez Tropical' }, { emoji: '🐟', name: 'Pez' }, { emoji: '🐡', name: 'Pez Globo' },
+                    { emoji: '🐢', name: 'Tortuga Marina' }, { emoji: '🦭', name: 'Foca' }, { emoji: '🪼', name: 'Medusa' },
+                    { emoji: '🐚', name: 'Caracola' }, { emoji: '🦪', name: 'Ostra' }, { emoji: '🪸', name: 'Coral' }
+                ],
+                colors: {
+                    bg: '#e0fbfc', back: '#005f73', backBorder: '#001219',
+                    text: '#003049', accent: '#0a9396', hover: '#005f73'
+                }
+            },
+            dinos: {
+                title: '🦖 Dinosaurios',
+                backIcon: '🌋',
+                items: [
+                    { emoji: '🦖', name: 'T-Rex' }, { emoji: '🦕', name: 'Diplodocus' }, { emoji: '🥚', name: 'Huevo Dino' },
+                    { emoji: '🦴', name: 'Fósil' }, { emoji: '🌋', name: 'Volcán' }, { emoji: '🦣', name: 'Mamut' },
+                    { emoji: '🦤', name: 'Dodo' }, { emoji: '🐊', name: 'Deinosuchus' }, { emoji: '🐢', name: 'Archelon' },
+                    { emoji: '🦎', name: 'Megalania' }, { emoji: '🦈', name: 'Megalodón' }, { emoji: '🦂', name: 'Pulmonoscorpio' },
+                    { emoji: '🐉', name: 'Pterodáctilo' }, { emoji: '🪨', name: 'Meteorito' }, { emoji: '🌿', name: 'Helecho' },
+                    { emoji: '👣', name: 'Huella' }, { emoji: '🐚', name: 'Amonites' }, { emoji: '🪲', name: 'Escarabajo Antiguo' }
+                ],
+                colors: {
+                    bg: '#f4f1de', back: '#5f0f40', backBorder: '#370617',
+                    text: '#3d405b', accent: '#9a031e', hover: '#5f0f40'
+                }
+            },
+            insects: {
+                title: '🦋 Insectos y Bichos',
+                backIcon: '🍃',
+                items: [
+                    { emoji: '🦋', name: 'Mariposa' }, { emoji: '🐛', name: 'Oruga' }, { emoji: '🐜', name: 'Hormiga' },
+                    { emoji: '🐝', name: 'Abeja' }, { emoji: '🪲', name: 'Escarabajo' }, { emoji: '🐞', name: 'Mariquita' },
+                    { emoji: '🦗', name: 'Grillo' }, { emoji: '🪳', name: 'Cucaracha' }, { emoji: '🕷️', name: 'Araña' },
+                    { emoji: '🦂', name: 'Escorpión' }, { emoji: '🦟', name: 'Mosquito' }, { emoji: '🪰', name: 'Mosca' },
+                    { emoji: '🪱', name: 'Lombriz' }, { emoji: '🐌', name: 'Caracol' }, { emoji: '🕸️', name: 'Telaraña' },
+                    { emoji: '🍯', name: 'Panal' }, { emoji: '🌸', name: 'Polen' }, { emoji: '🌱', name: 'Brote' }
+                ],
+                colors: {
+                    bg: '#f3f8e8', back: '#4a7c59', backBorder: '#2c4c3b',
+                    text: '#283618', accent: '#68b0ab', hover: '#4a7c59'
+                }
+            },
+            birds: {
+                title: '🦅 Aves',
+                backIcon: '🪶',
+                items: [
+                    { emoji: '🦅', name: 'Águila' }, { emoji: '🦉', name: 'Búho' }, { emoji: '🦜', name: 'Loro' },
+                    { emoji: '🦩', name: 'Flamenco' }, { emoji: '🦚', name: 'Pavo Real' }, { emoji: '🦢', name: 'Cisne' },
+                    { emoji: '🐧', name: 'Pingüino' }, { emoji: '🦆', name: 'Pato' }, { emoji: '🕊️', name: 'Paloma' },
+                    { emoji: '🐦', name: 'Gorrión' }, { emoji: '🐤', name: 'Canario' }, { emoji: '🐓', name: 'Gallo' },
+                    { emoji: '🦃', name: 'Pavo' }, { emoji: '🦤', name: 'Dodo' }, { emoji: '🐦‍⬛', name: 'Cuervo' },
+                    { emoji: '🪿', name: 'Ganso' }, { emoji: '🪶', name: 'Pluma' }, { emoji: '🪺', name: 'Nido' }
+                ],
+                colors: {
+                    bg: '#edf6f9', back: '#3d5a80', backBorder: '#293241',
+                    text: '#293241', accent: '#5c80bc', hover: '#3d5a80'
+                }
+            },
+            levels_mix: {
+                title: '🌈 Todas las Especies',
+                backIcon: '🐾',
+                items: [
+                    { emoji: '🦁', name: 'León' }, { emoji: '🐘', name: 'Elefante' }, { emoji: '🦊', name: 'Zorro' },
+                    { emoji: '🐼', name: 'Panda' }, { emoji: '🐸', name: 'Rana' }, { emoji: '🐧', name: 'Pingüino' },
+                    { emoji: '🐙', name: 'Pulpo' }, { emoji: '🦉', name: 'Búho' }, { emoji: '🐯', name: 'Tigre' },
+                    { emoji: '🐨', name: 'Koala' }, { emoji: '🦒', name: 'Jirafa' }, { emoji: '🦓', name: 'Cebra' },
+                    { emoji: '🐢', name: 'Tortuga' }, { emoji: '🐬', name: 'Delfín' }, { emoji: '🦋', name: 'Mariposa' },
+                    { emoji: '🐝', name: 'Abeja' }, { emoji: '🦖', name: 'T-Rex' }, { emoji: '🦩', name: 'Flamenco' }
+                ],
+                colors: {
+                    bg: '#f0f7f4', back: '#2d6a4f', backBorder: '#1b4332',
+                    text: '#1b4332', accent: '#40916c', hover: '#2d6a4f'
+                }
+            }
+        };
+
+        // Configuración de los 8 Niveles Progresivos
+        const LEVELS = [
+            { level: 1, pairs: 3,  cols: 3, rows: 2, time: 25,  sizeClass: 'size-lg' },
+            { level: 2, pairs: 4,  cols: 4, rows: 2, time: 35,  sizeClass: 'size-lg' },
+            { level: 3, pairs: 6,  cols: 4, rows: 3, time: 50,  sizeClass: 'size-md' },
+            { level: 4, pairs: 8,  cols: 4, rows: 4, time: 65,  sizeClass: 'size-md' },
+            { level: 5, pairs: 10, cols: 5, rows: 4, time: 85,  sizeClass: 'size-sm' },
+            { level: 6, pairs: 12, cols: 6, rows: 4, time: 105, sizeClass: 'size-sm' },
+            { level: 7, pairs: 15, cols: 6, rows: 5, time: 135, sizeClass: 'size-xs' },
+            { level: 8, pairs: 18, cols: 6, rows: 6, time: 170, sizeClass: 'size-xs' }
+        ];
+
+        const DIFFICULTIES = {
+            easy:   { pairs: 6,  cols: 4, time: 45, sizeClass: 'size-md' },
+            medium: { pairs: 8,  cols: 4, time: 65, sizeClass: 'size-md' },
+            hard:   { pairs: 12, cols: 6, time: 95, sizeClass: 'size-sm' }
+        };
+
+        // Audio Sintetizado
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        function playTone(freq, type, duration, delay = 0) {
+            if (!soundEnabled) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime + delay);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime + delay);
+            osc.stop(audioCtx.currentTime + delay + duration);
+        }
+
+        function sfxFlip() { playTone(420, 'sine', 0.12); }
+        function sfxMatch() { playTone(523.25, 'triangle', 0.15, 0); playTone(659.25, 'triangle', 0.25, 0.1); }
+        function sfxMismatch() { playTone(220, 'sawtooth', 0.15, 0); playTone(185, 'sawtooth', 0.2, 0.12); }
+        function sfxTick() { playTone(880, 'sine', 0.06); }
+        function sfxWin() { [523.25, 659.25, 783.99, 1046.50].forEach((n, i) => playTone(n, 'triangle', 0.25, i * 0.1)); }
+        function sfxLose() { [350, 310, 270, 220].forEach((n, i) => playTone(n, 'sawtooth', 0.25, i * 0.12)); }
+
+        // Estado del Juego
+        let currentThemeKey = 'levels_mix';
+        let gameMode = 'levels';
+        let currentLevelIdx = 0;
+        let currentDifficulty = 'medium';
+        let totalPairs = 3;
+
+        let firstCard = null;
+        let secondCard = null;
+        let matchedPairs = 0;
+        let lockBoard = false;
+
+        let currentPlayer = 1;
+        let scoreP1 = 0;
+        let scoreP2 = 0;
+
+        let cpuMemory = {};
+        let cpuTimer = null;
+
+        let timeLeft = 30;
+        let maxTime = 30;
+        let countdownInterval = null;
+        let timerStarted = false;
+        let movesCount = 0;
+
+        // Referencias DOM
+        const gameTitle = document.getElementById('game-title');
+        const board = document.getElementById('board');
+        const themeSelect = document.getElementById('theme-select');
+        const modeSelect = document.getElementById('mode-select');
+        const difficultyGroup = document.getElementById('difficulty-group');
+        const difficultySelect = document.getElementById('difficulty-select');
+        const cpuLevelGroup = document.getElementById('cpu-level-group');
+        const cpuLevelSelect = document.getElementById('cpu-level');
+        const namesGroup = document.getElementById('names-group');
+        const p1Input = document.getElementById('p1-input');
+        const p2Input = document.getElementById('p2-input');
+        const vsLabel = document.getElementById('vs-label');
+
+        const levelsHud = document.getElementById('levels-hud');
+        const levelBadge = document.getElementById('level-badge');
+        const levelGridInfo = document.getElementById('level-grid-info');
+        const levelDots = document.getElementById('level-dots');
+
+        const scoreboardArea = document.getElementById('scoreboard-area');
+        const timerArea = document.getElementById('timer-area');
+        const timeLeftDisplay = document.getElementById('time-left');
+        const movesCountDisplay = document.getElementById('moves-count');
+        const timeBar = document.getElementById('time-bar');
+
+        const p1Box = document.getElementById('p1-box');
+        const p2Box = document.getElementById('p2-box');
+        const p1NameDisplay = document.getElementById('p1-name-display');
+        const p2NameDisplay = document.getElementById('p2-name-display');
+        const p1ScoreDisplay = document.getElementById('p1-score');
+        const p2ScoreDisplay = document.getElementById('p2-score');
+        const turnText = document.getElementById('turn-text');
+
+        const restartBtn = document.getElementById('restart-btn');
+        const soundBtn = document.getElementById('sound-btn');
+        const winModal = document.getElementById('win-modal');
+        const winnerTitle = document.getElementById('winner-title');
+        const winStats = document.getElementById('win-stats');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const resetCampaignBtn = document.getElementById('reset-campaign-btn');
+
+        soundBtn.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+        });
+
+        function applyTheme(themeKey) {
+            currentThemeKey = themeKey;
+            const theme = THEMES[themeKey];
+            const root = document.documentElement;
+
+            root.style.setProperty('--bg-color', theme.colors.bg);
+            root.style.setProperty('--card-back', theme.colors.back);
+            root.style.setProperty('--card-back-border', theme.colors.backBorder);
+            root.style.setProperty('--text-color', theme.colors.text);
+            root.style.setProperty('--accent-color', theme.colors.accent);
+            root.style.setProperty('--accent-hover', theme.colors.hover);
+
+            gameTitle.textContent = `${theme.title} - Memoria`;
+        }
+
+        function updateModeControls() {
+            gameMode = modeSelect.value;
+
+            levelsHud.classList.add('hidden');
+            difficultyGroup.classList.add('hidden');
+            cpuLevelGroup.classList.add('hidden');
+            namesGroup.classList.add('hidden');
+            scoreboardArea.classList.add('hidden');
+            timerArea.classList.add('hidden');
+
+            if (gameMode === 'levels') {
+                levelsHud.classList.remove('hidden');
+                timerArea.classList.remove('hidden');
+                restartBtn.textContent = 'Reiniciar Nivel';
+            } else if (gameMode === 'timed') {
+                difficultyGroup.classList.remove('hidden');
+                timerArea.classList.remove('hidden');
+                restartBtn.textContent = 'Reiniciar Partida';
+            } else if (gameMode === 'cpu') {
+                difficultyGroup.classList.remove('hidden');
+                cpuLevelGroup.classList.remove('hidden');
+                namesGroup.classList.remove('hidden');
+                scoreboardArea.classList.remove('hidden');
+                p2Input.classList.add('hidden');
+                vsLabel.classList.add('hidden');
+                restartBtn.textContent = 'Reiniciar Partida';
+            } else {
+                difficultyGroup.classList.remove('hidden');
+                namesGroup.classList.remove('hidden');
+                scoreboardArea.classList.remove('hidden');
+                p2Input.classList.remove('hidden');
+                vsLabel.classList.remove('hidden');
+                restartBtn.textContent = 'Reiniciar Partida';
+            }
+        }
+
+        function renderLevelProgress() {
+            const lvlData = LEVELS[currentLevelIdx];
+            const totalCards = lvlData.pairs * 2;
+            levelBadge.textContent = `Nivel ${lvlData.level} / ${LEVELS.length}`;
+            levelGridInfo.textContent = `Tablero ${lvlData.rows}x${lvlData.cols} (${totalCards} cartas)`;
+
+            levelDots.innerHTML = '';
+            LEVELS.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.classList.add('level-dot');
+                if (idx < currentLevelIdx) dot.classList.add('completed');
+                if (idx === currentLevelIdx) dot.classList.add('current');
+                levelDots.appendChild(dot);
+            });
+        }
+
+        function getPlayerNames() {
+            const name1 = p1Input.value.trim() || 'Jugador 1';
+            const name2 = gameMode === 'cpu' ? 'CPU 🤖' : (p2Input.value.trim() || 'Jugador 2');
+            return { name1, name2 };
+        }
+
+        function updateNamesUI() {
+            const { name1, name2 } = getPlayerNames();
+            p1NameDisplay.textContent = name1;
+            p2NameDisplay.textContent = name2;
+            updateTurnUI();
+        }
+
+        p1Input.addEventListener('input', updateNamesUI);
+        p2Input.addEventListener('input', updateNamesUI);
+
+        function shuffleCards(list) {
+            return list
+                .map(value => ({ value, sort: Math.random() }))
+                .sort((a, b) => a.sort - b.sort)
+                .map(({ value }) => value);
+        }
+
+        function updateTurnUI() {
+            if (gameMode === 'levels') {
+                const lvlData = LEVELS[currentLevelIdx];
+                turnText.textContent = `Nivel ${lvlData.level}: ¡Encontrá los ${lvlData.pairs} pares!`;
+                turnText.style.color = 'var(--text-color)';
+                return;
+            }
+            if (gameMode === 'timed') {
+                turnText.textContent = '¡Encontrá todos los pares antes de que acabe el tiempo!';
+                turnText.style.color = 'var(--text-color)';
+                return;
+            }
+
+            const { name1, name2 } = getPlayerNames();
+            if (currentPlayer === 1) {
+                p1Box.classList.add('active');
+                p2Box.classList.remove('active');
+                turnText.textContent = `Turno: ${name1}`;
+                turnText.style.color = 'var(--p1-color)';
+            } else {
+                p2Box.classList.add('active');
+                p1Box.classList.remove('active');
+                turnText.textContent = `Turno: ${name2}`;
+                turnText.style.color = 'var(--p2-color)';
+            }
+        }
+
+        function startCountdown() {
+            if (timerStarted) return;
+            timerStarted = true;
+
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                timeLeftDisplay.textContent = timeLeft;
+
+                const pct = (timeLeft / maxTime) * 100;
+                timeBar.style.width = `${Math.max(0, pct)}%`;
+
+                if (timeLeft <= 5 && timeLeft > 0) {
+                    timeBar.classList.remove('warning');
+                    timeBar.classList.add('danger');
+                    sfxTick();
+                } else if (pct <= 45) {
+                    timeBar.classList.add('warning');
+                }
+
+                if (timeLeft <= 0) {
+                    stopCountdown();
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function stopCountdown() {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+
+        function handleTimeOut() {
+            lockBoard = true;
+            sfxLose();
+
+            if (gameMode === 'levels') {
+                const lvlData = LEVELS[currentLevelIdx];
+                winnerTitle.textContent = '⏰ ¡Se acabó el tiempo!';
+                winStats.innerHTML = `Te quedaste en el <strong>Nivel ${lvlData.level}</strong>.<br>Encontraste <strong>${matchedPairs} de ${totalPairs}</strong> pares.`;
+                playAgainBtn.textContent = 'Reintentar Nivel';
+                playAgainBtn.dataset.action = 'retry_level';
+                resetCampaignBtn.classList.remove('hidden');
+            } else {
+                winnerTitle.textContent = '⏰ ¡Se acabó el tiempo!';
+                winStats.innerHTML = `Encontraste <strong>${matchedPairs} de ${totalPairs}</strong> pares en ${movesCount} movimientos.`;
+                playAgainBtn.textContent = 'Intentar de nuevo';
+                playAgainBtn.dataset.action = 'restart';
+                resetCampaignBtn.classList.add('hidden');
+            }
+
+            winModal.classList.add('show');
+        }
+
+        function switchTurn() {
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            updateTurnUI();
+
+            if (gameMode === 'cpu' && currentPlayer === 2 && matchedPairs < totalPairs) {
+                triggerCpuTurn();
+            }
+        }
+
+        function initGame() {
+            clearTimeout(cpuTimer);
+            stopCountdown();
+            board.innerHTML = '';
+
+            firstCard = null;
+            secondCard = null;
+            matchedPairs = 0;
+            lockBoard = false;
+            currentPlayer = 1;
+            scoreP1 = 0;
+            scoreP2 = 0;
+            cpuMemory = {};
+            movesCount = 0;
+            timerStarted = false;
+
+            const theme = THEMES[currentThemeKey];
+            let cols = 4;
+            let sizeClass = 'size-md';
+
+            if (gameMode === 'levels') {
+                const lvlData = LEVELS[currentLevelIdx];
+                totalPairs = lvlData.pairs;
+                cols = lvlData.cols;
+                maxTime = lvlData.time;
+                sizeClass = lvlData.sizeClass;
+                renderLevelProgress();
+            } else {
+                const diff = DIFFICULTIES[currentDifficulty];
+                totalPairs = diff.pairs;
+                cols = diff.cols;
+                maxTime = diff.time;
+                sizeClass = diff.sizeClass;
+            }
+
+            timeLeft = maxTime;
+            timeLeftDisplay.textContent = timeLeft;
+            movesCountDisplay.textContent = '0';
+            timeBar.style.width = '100%';
+            timeBar.classList.remove('warning', 'danger');
+
+            board.className = `game-board ${sizeClass}`;
+            board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+            p1ScoreDisplay.textContent = '0';
+            p2ScoreDisplay.textContent = '0';
+            winModal.classList.remove('show');
+            updateNamesUI();
+
+            // Selección estricta de animales pertenecientes únicamente a la temática elegida
+            const selectedItems = shuffleCards([...theme.items]).slice(0, totalPairs);
+            const deck = shuffleCards([...selectedItems, ...selectedItems]);
+
+            deck.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.animal = item.name;
+                card.dataset.index = index;
+
+                card.innerHTML = `
+                    <div class="card-face card-back"><span>${theme.backIcon}</span></div>
+                    <div class="card-face card-front">
+                        <div class="card-emoji">${item.emoji}</div>
+                        <div class="card-label">${item.name}</div>
+                    </div>
+                `;
+
+                card.addEventListener('click', handleCardClick);
+                board.appendChild(card);
+            });
+        }
+
+        function handleCardClick() {
+            if (gameMode === 'cpu' && currentPlayer === 2) return;
+            flipCardElement(this);
+        }
+
+        function flipCardElement(card) {
+            if (lockBoard) return;
+            if (card === firstCard) return;
+            if (card.classList.contains('matched')) return;
+
+            if ((gameMode === 'timed' || gameMode === 'levels') && !timerStarted) {
+                startCountdown();
+            }
+
+            sfxFlip();
+            card.classList.add('flipped');
+
+            const accuracy = parseFloat(cpuLevelSelect.value);
+            if (Math.random() < accuracy) {
+                cpuMemory[card.dataset.index] = card.dataset.animal;
+            }
+
+            if (!firstCard) {
+                firstCard = card;
+                return;
+            }
+
+            secondCard = card;
+            movesCount++;
+            movesCountDisplay.textContent = movesCount;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            const isMatch = firstCard.dataset.animal === secondCard.dataset.animal;
+            if (isMatch) {
+                handleMatch();
+            } else {
+                handleMismatch();
+            }
+        }
+
+        function handleMatch() {
+            sfxMatch();
+            const playerClass = (gameMode === 'timed' || gameMode === 'levels')
+                ? 'matched-p1'
+                : (currentPlayer === 1 ? 'matched-p1' : 'matched-p2');
+
+            firstCard.classList.add('matched', playerClass);
+            secondCard.classList.add('matched', playerClass);
+
+            delete cpuMemory[firstCard.dataset.index];
+            delete cpuMemory[secondCard.dataset.index];
+
+            firstCard = null;
+            secondCard = null;
+            matchedPairs++;
+
+            if (gameMode === 'pvp' || gameMode === 'cpu') {
+                if (currentPlayer === 1) {
+                    scoreP1++;
+                    p1ScoreDisplay.textContent = scoreP1;
+                } else {
+                    scoreP2++;
+                    p2ScoreDisplay.textContent = scoreP2;
+                }
+            }
+
+            if (matchedPairs === totalPairs) {
+                stopCountdown();
+                setTimeout(showGameOver, 500);
+            } else if (gameMode === 'cpu' && currentPlayer === 2) {
+                triggerCpuTurn();
+            }
+        }
+
+        function handleMismatch() {
+            lockBoard = true;
+            setTimeout(() => {
+                sfxMismatch();
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                firstCard = null;
+                secondCard = null;
+                lockBoard = false;
+
+                if (gameMode === 'pvp' || gameMode === 'cpu') {
+                    switchTurn();
+                }
+            }, 850);
+        }
+
+        function triggerCpuTurn() {
+            lockBoard = true;
+            cpuTimer = setTimeout(() => {
+                const allCards = Array.from(document.querySelectorAll('.card'));
+                const availableCards = allCards.filter(c => !c.classList.contains('matched'));
+                if (availableCards.length < 2) return;
+
+                let chosenFirst = null;
+                let chosenSecond = null;
+
+                const seenByAnimal = {};
+                availableCards.forEach(card => {
+                    const idx = card.dataset.index;
+                    const rememberedAnimal = cpuMemory[idx];
+                    if (rememberedAnimal) {
+                        if (!seenByAnimal[rememberedAnimal]) {
+                            seenByAnimal[rememberedAnimal] = [];
+                        }
+                        seenByAnimal[rememberedAnimal].push(card);
+                    }
+                });
+
+                for (const animal in seenByAnimal) {
+                    if (seenByAnimal[animal].length >= 2) {
+                        chosenFirst = seenByAnimal[animal][0];
+                        chosenSecond = seenByAnimal[animal][1];
+                        break;
+                    }
+                }
+
+                if (!chosenFirst) {
+                    chosenFirst = availableCards[Math.floor(Math.random() * availableCards.length)];
+                    const firstIdx = chosenFirst.dataset.index;
+                    const firstAnimal = chosenFirst.dataset.animal;
+
+                    const matchingCard = availableCards.find(c =>
+                        c.dataset.index !== firstIdx && cpuMemory[c.dataset.index] === firstAnimal
+                    );
+
+                    if (matchingCard) {
+                        chosenSecond = matchingCard;
+                    } else {
+                        const remaining = availableCards.filter(c => c.dataset.index !== firstIdx);
+                        chosenSecond = remaining[Math.floor(Math.random() * remaining.length)];
+                    }
+                }
+
+                lockBoard = false;
+                flipCardElement(chosenFirst);
+
+                cpuTimer = setTimeout(() => {
+                    flipCardElement(chosenSecond);
+                }, 550);
+
+            }, 650);
+        }
+
+        function showGameOver() {
+            sfxWin();
+            resetCampaignBtn.classList.add('hidden');
+
+            if (gameMode === 'levels') {
+                const lvlData = LEVELS[currentLevelIdx];
+                const timeUsed = maxTime - timeLeft;
+
+                if (currentLevelIdx < LEVELS.length - 1) {
+                    winnerTitle.textContent = `🌟 ¡Nivel ${lvlData.level} Superado!`;
+                    winStats.innerHTML = `Completaste el tablero de <strong>${lvlData.rows}x${lvlData.cols}</strong> en <strong>${timeUsed}s</strong> y <strong>${movesCount}</strong> movimientos.`;
+                    playAgainBtn.textContent = `Pasar al Nivel ${lvlData.level + 1} ➡️`;
+                    playAgainBtn.dataset.action = 'next_level';
+                } else {
+                    winnerTitle.textContent = '👑 ¡CAMPEÓN TOTAL!';
+                    winStats.innerHTML = `¡Completaste los <strong>8 niveles</strong> de <strong>${THEMES[currentThemeKey].title}</strong>!<br>Último tablero de 36 cartas resuelto en <strong>${timeUsed}s</strong>.`;
+                    playAgainBtn.textContent = 'Jugar de nuevo desde Nivel 1';
+                    playAgainBtn.dataset.action = 'reset_campaign';
+                }
+            } else if (gameMode === 'timed') {
+                const timeUsed = maxTime - timeLeft;
+                winnerTitle.textContent = '🎉 ¡Desafío Superado!';
+                winStats.innerHTML = `Completaste los <strong>${totalPairs} pares</strong> en <strong>${timeUsed} segundos</strong> y <strong>${movesCount}</strong> movimientos.`;
+                playAgainBtn.textContent = 'Jugar de nuevo';
+                playAgainBtn.dataset.action = 'restart';
+            } else {
+                const { name1, name2 } = getPlayerNames();
+                if (scoreP1 > scoreP2) {
+                    winnerTitle.textContent = `🎉 ¡Ganó ${name1}!`;
+                } else if (scoreP2 > scoreP1) {
+                    winnerTitle.textContent = `🎉 ¡Ganó ${name2}!`;
+                } else {
+                    winnerTitle.textContent = '🤝 ¡Es un empate!';
+                }
+                winStats.innerHTML = `Resultado final:<br><strong>${name1}:</strong> ${scoreP1} pares<br><strong>${name2}:</strong> ${scoreP2} pares`;
+                playAgainBtn.textContent = 'Revancha';
+                playAgainBtn.dataset.action = 'restart';
+            }
+
+            winModal.classList.add('show');
+        }
+
+        // Eventos
+        themeSelect.addEventListener('change', (e) => {
+            applyTheme(e.target.value);
+            initGame();
+        });
+
+        modeSelect.addEventListener('change', () => {
+            updateModeControls();
+            if (gameMode === 'levels') {
+                currentLevelIdx = 0;
+            }
+            initGame();
+        });
+
+        difficultySelect.addEventListener('change', (e) => {
+            currentDifficulty = e.target.value;
+            initGame();
+        });
+
+        cpuLevelSelect.addEventListener('change', initGame);
+        restartBtn.addEventListener('click', initGame);
+
+        playAgainBtn.addEventListener('click', () => {
+            const action = playAgainBtn.dataset.action;
+            if (action === 'next_level') {
+                currentLevelIdx++;
+            } else if (action === 'reset_campaign') {
+                currentLevelIdx = 0;
+            }
+            initGame();
+        });
+
+        resetCampaignBtn.addEventListener('click', () => {
+            currentLevelIdx = 0;
+            initGame();
+        });
+
+        // Inicialización
+        applyTheme(currentThemeKey);
+        updateModeControls();
+        initGame();
+    </script>
+</body>
+</html>
